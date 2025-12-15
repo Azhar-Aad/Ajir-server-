@@ -101,26 +101,22 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// ADMIN LOGIN (FIXED)
 app.post("/admin-login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    const admin = await Admin.findOne({ username });
-    if (!admin) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    const match = await bcrypt.compare(password, admin.password);
-    if (!match) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    res.json({ message: "Admin login successful" });
-  } catch {
-    res.status(500).json({ message: "Admin login error" });
+  const admin = await Admin.findOne({ username });
+  if (!admin) {
+    return res.status(400).json({ message: "Invalid credentials" });
   }
+
+  const match = await bcrypt.compare(password, admin.password);
+  if (!match) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  res.json({ message: "Admin login successful" });
 });
+
 
 /* ===================== PRODUCTS ===================== */
 app.post("/admin/add-product", async (req, res) => {
