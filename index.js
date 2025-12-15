@@ -136,6 +136,41 @@ app.get("/products/category/:category", async (req, res) => {
   res.json(await Product.find({ category: req.params.category }));
 });
 
+
+
+app.put("/admin/update-product/:id", async (req, res) => {
+  try {
+    const updated = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ message: "Product updated successfully", product: updated });
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
+  }
+});
+
+// DELETE
+app.delete("/admin/delete-product/:id", async (req, res) => {
+  try {
+    const deleted = await Product.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Delete failed" });
+  }
+});
+
 app.post("/order", async (req, res) => {
   try {
     const order = await Order.create({
@@ -175,6 +210,9 @@ app.post("/order", async (req, res) => {
     res.status(500).json({ message: "Order failed" });
   }
 });
+
+
+
 
 
 
