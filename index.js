@@ -136,8 +136,7 @@ app.get("/products/category/:category", async (req, res) => {
   res.json(await Product.find({ category: req.params.category }));
 });
 
-
-
+//update
 app.put("/admin/update-product/:id", async (req, res) => {
   try {
     const updated = await Product.findByIdAndUpdate(
@@ -146,30 +145,26 @@ app.put("/admin/update-product/:id", async (req, res) => {
       { new: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.json({ message: "Product updated successfully", product: updated });
+    res.json({
+      message: "Product updated successfully",
+      product: updated,
+    });
   } catch (err) {
     res.status(500).json({ message: "Update failed" });
   }
 });
 
-// DELETE
+// DELETE PRODUCT
 app.delete("/admin/delete-product/:id", async (req, res) => {
   try {
-    const deleted = await Product.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
+    await Product.findByIdAndDelete(req.params.id);
     res.json({ message: "Product deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Delete failed" });
   }
 });
+
+
 
 app.post("/order", async (req, res) => {
   try {
@@ -180,25 +175,20 @@ app.post("/order", async (req, res) => {
       email: req.body.email || "",
       phone: req.body.phone || "",
 
-      product: {
-        id: req.body.product?._id,
-        category: req.body.product?.category,
-        price: req.body.product?.price,
-        image: req.body.product?.image,
-      },
+      product: req.body.product,
 
-      rentalPeriod: {
-        from: req.body.rentalPeriod?.from || req.body.from || "",
-        to: req.body.rentalPeriod?.to || req.body.to || "",
+      rentalPeriod: req.body.rentalPeriod || {
+        from: "",
+        to: "",
       },
 
       quantity: req.body.quantity || 1,
       deliveryLocation: req.body.deliveryLocation || "",
       buildingAddress: req.body.buildingAddress || "",
 
-      location: {
-        latitude: req.body.location?.latitude || req.body.latitude || null,
-        longitude: req.body.location?.longitude || req.body.longitude || null,
+      location: req.body.location || {
+        latitude: 0,
+        longitude: 0,
       },
 
       total: req.body.total || 0,
@@ -212,10 +202,6 @@ app.post("/order", async (req, res) => {
 });
 
 
-
-
-
-
 app.get("/orders/:userId", async (req, res) => {
   res.json(
     await Order.find({ userId: req.params.userId }).sort({ createdAt: -1 })
@@ -223,20 +209,22 @@ app.get("/orders/:userId", async (req, res) => {
 });
 
 app.post("/payment/complete", async (req, res) => {
-  const order = await Order.findById(req.body.orderId);
+  try {
+    const order = await Order.findById(req.body.orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
-  if (!order) {
-    return res.status(404).json({ message: "Order not found" });
+    await Payment.create({
+      orderId: order._id,
+      paymentMethod: "CARD",
+      status: "SUCCESS",
+      amountPaid: order.total,
+    });
+
+    res.json({ message: "Payment successful" });
+  } catch (err) {
+    console.error("Payment error:", err);
+    res.status(500).json({ message: "Payment failed" });
   }
-
-  await Payment.create({
-    orderId: order._id,
-    paymentMethod: req.body.paymentMethod || "CARD",
-    status: "SUCCESS",
-    amountPaid: order.total || 0,
-  });
-
-  res.json({ message: "Payment successful" });
 });
 
 

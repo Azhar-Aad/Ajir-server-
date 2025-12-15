@@ -2,42 +2,44 @@ import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema(
   {
-    userId: String,
+    userId: {
+      type: String,
+      required: true,
+    },
 
-    // USER INFO
     name: String,
     email: String,
     phone: String,
-    civilId: String,
 
-    // PRODUCT INFO
     product: {
-      id: mongoose.Schema.Types.ObjectId,
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
       category: String,
       price: Number,
       image: String,
     },
 
-    // RENTAL PERIOD (NO REQUIRED)
     rentalPeriod: {
       from: String,
       to: String,
     },
 
-    // ORDER DETAILS
     quantity: Number,
+
     deliveryLocation: String,
     buildingAddress: String,
-    note: String,
 
-    // GPS LOCATION (NO REQUIRED)
     location: {
       latitude: Number,
       longitude: Number,
     },
 
-    // PAYMENT
-    total: Number,
+    total: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,
