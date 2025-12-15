@@ -2,106 +2,45 @@ import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
+    userId: String,
 
-    // ---------------- USER INFO ----------------
-    name: {
-      type: String,
-      required: true,
-    },
+    // USER INFO
+    name: String,
+    email: String,
+    phone: String,
+    civilId: String,
 
-    email: {
-      type: String,
-      required: true,
-    },
-
-    phone: {
-      type: String,
-      required: true,
-    },
-
-    civilId: {
-      type: String,
-    },
-
-    // ---------------- PRODUCT INFO ----------------
+    // PRODUCT INFO
     product: {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
-      image: {
-        type: String,
-      },
+      id: mongoose.Schema.Types.ObjectId,
+      category: String,
+      price: Number,
+      image: String,
     },
 
-    // ---------------- RENTAL PERIOD ----------------
+    // RENTAL PERIOD (NO REQUIRED)
     rentalPeriod: {
-      from: {
-        type: String,
-        required: true,
-      },
-      to: {
-        type: String,
-        required: true,
-      },
+      from: String,
+      to: String,
     },
 
-    // ---------------- ORDER DETAILS ----------------
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
+    // ORDER DETAILS
+    quantity: Number,
+    deliveryLocation: String,
+    buildingAddress: String,
+    note: String,
 
-    deliveryLocation: {
-      type: String,
-      required: true,
-    },
-
-    buildingAddress: {
-      type: String,
-      required: true,
-    },
-
-    note: {
-      type: String,
-    },
-
-    // ---------------- GPS LOCATION ----------------
+    // GPS LOCATION (NO REQUIRED)
     location: {
-      latitude: {
-        type: Number,
-        required: true,
-      },
-      longitude: {
-        type: Number,
-        required: true,
-      },
+      latitude: Number,
+      longitude: Number,
     },
 
-    // ---------------- PAYMENT ----------------
-    total: {
-      type: Number,
-      required: true,
-    },
-
-    // ---------------- ORDER DATE ----------------
-    orderDate: {
-      type: Date,
-      default: Date.now,
-    },
+    // PAYMENT
+    total: Number,
   },
   {
-    timestamps: true, // adds createdAt & updatedAt automatically
+    timestamps: true,
   }
 );
 

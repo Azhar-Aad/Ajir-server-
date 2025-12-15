@@ -140,39 +140,47 @@ app.get("/products/category/:category", async (req, res) => {
   res.json(await Product.find({ category: req.params.category }));
 });
 
-/* ===================== ORDERS ===================== */
 app.post("/order", async (req, res) => {
-  const order = await Order.create({
-    userId: req.body.userId,
-    name: req.body.name,
-    email: req.body.email,
-    phone: req.body.phone,
+  try {
+    const order = await Order.create({
+      userId: req.body.userId || "guest",
 
-    product: {
-      id: req.body.product._id,
-      name: req.body.product.category,
-      price: req.body.product.price,
-      image: req.body.product.image,
-    },
+      name: req.body.name || "",
+      email: req.body.email || "",
+      phone: req.body.phone || "",
 
-    rentalPeriod: {
-      from: req.body.from,
-      to: req.body.to,
-    },
+      product: {
+        id: req.body.product?._id,
+        category: req.body.product?.category,
+        price: req.body.product?.price,
+        image: req.body.product?.image,
+      },
 
-    deliveryLocation: req.body.deliveryLocation,
-    buildingAddress: req.body.buildingAddress,
-    quantity: req.body.quantity,
-    total: req.body.total,
+      rentalPeriod: {
+        from: req.body.rentalPeriod?.from || req.body.from || "",
+        to: req.body.rentalPeriod?.to || req.body.to || "",
+      },
 
-    location: {
-      latitude: req.body.latitude,
-      longitude: req.body.longitude,
-    },
-  });
+      quantity: req.body.quantity || 1,
+      deliveryLocation: req.body.deliveryLocation || "",
+      buildingAddress: req.body.buildingAddress || "",
 
-  res.json({ orderId: order._id });
+      location: {
+        latitude: req.body.location?.latitude || req.body.latitude || null,
+        longitude: req.body.location?.longitude || req.body.longitude || null,
+      },
+
+      total: req.body.total || 0,
+    });
+
+    res.json({ orderId: order._id });
+  } catch (err) {
+    console.error("Order error:", err);
+    res.status(500).json({ message: "Order failed" });
+  }
 });
+
+
 
 app.get("/orders/:userId", async (req, res) => {
   res.json(
@@ -180,7 +188,6 @@ app.get("/orders/:userId", async (req, res) => {
   );
 });
 
-/* ===================== PAYMENT ===================== */
 app.post("/payment/complete", async (req, res) => {
   const order = await Order.findById(req.body.orderId);
 
@@ -192,11 +199,12 @@ app.post("/payment/complete", async (req, res) => {
     orderId: order._id,
     paymentMethod: req.body.paymentMethod || "CARD",
     status: "SUCCESS",
-    amountPaid: order.total,
+    amountPaid: order.total || 0,
   });
 
   res.json({ message: "Payment successful" });
 });
+
 
 /* ===================== WISHLIST ===================== */
 app.get("/wishlist/:userId", async (req, res) => {
